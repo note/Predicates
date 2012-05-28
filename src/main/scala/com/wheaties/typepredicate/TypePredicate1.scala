@@ -22,18 +22,14 @@ abstract class TypePredicate1[A,Cond[_] <: Conditional,Implicit[_]] extends Cond
   type Result = Answer#Result
 }
 
-trait Numerical[A] extends Conditional
-private abstract class NumericTrue[A](implicit ev: Numeric[A]) extends Numerical[A]{
-  type Result = True
-}
-private abstract class NumericFalse[A] extends Numerical[A]{
-  type Result = False
-}
-
+/**
+ * Answers the question "Is this a Numeric type?"
+ */
+sealed abstract class Numerical[A] extends Conditional
 object IsNumeric extends PredicateCompanion1[Numerical]{
-  implicit def pred[A]:Numerical[A] = new NumericFalse[A] {}
+  implicit def pred[A] = new Numerical[A] { type Result = False }
 }
 
 abstract class IsNumeric[A] extends TypePredicate1[A,Numerical,Numeric]{
-  implicit def pred[B](implicit ev: Numeric[B]):Numerical[B] = new NumericTrue[B] {}
+  implicit def pred[B](implicit ev: Numeric[B]) = new Numerical[B]{ type Result = True }
 }
